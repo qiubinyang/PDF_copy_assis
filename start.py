@@ -5,4 +5,4 @@ import main
 # ip=re.findall(r'\d+.\d+.\d+.\d+',text)
 # print(ip)
 
-main.begin()
+main = main.main().show()

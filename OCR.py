@@ -14,6 +14,6 @@ def OCR(filename):
 
     ocr_result = ""
     for i in result['words_result']:
-        ocr_result += i['words']
+        ocr_result += i['words']+'\n'
     # print(ocr_result)
     return ocr_result

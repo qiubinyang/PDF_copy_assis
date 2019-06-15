@@ -1,6 +1,5 @@
 import tkinter
-import tkinter.filedialog
-import os
+from os import remove
 from PIL import ImageGrab
 from time import sleep
 import main
@@ -59,7 +58,7 @@ def begin():
         im.close()
         w = MyCapture(filename)
         buttonCapture.wait_window(w.top)
-        os.remove(filename)
+        remove(filename)
     label = tkinter.Label(root1,text='切换到的想要截图的窗口，点击下方的截图按钮\n按住鼠标左键框选区域')
     label.place(x=0, y=0, width=500, height=60)
     buttonCapture = tkinter.Button(root1, text='截图', command=buttonCaptureClick,font=10)

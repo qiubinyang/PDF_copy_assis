@@ -17,13 +17,14 @@ class main():
         self.photo = photo
     def show(self):
         root = tk.Tk()
+        root.iconbitmap('./icon.ico')
         root.resizable(width=False, height=False)
         root.title('PDF复制助手 v 1.0--powered by Kevin 邱')
         screenwidth = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
-        width = 950
-        height = 900
-        root.geometry('%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, 10))
+        width = 660
+        height = 730
+        root.geometry('%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, 20))
 
         # 菜单栏
         menuBar = tk.Menu(root)
@@ -119,7 +120,7 @@ class main():
         label_frame1.pack(anchor=tk.W)
         label1 = tk.Label(label_frame1,
                           text='贴入复制文字：',
-                          font=('宋体', 12, 'bold'),
+                          font=('微软雅黑', 11, 'bold'),
                           width=15, height=2
                           )
         label1.pack(side=tk.LEFT, anchor=tk.W, expand=tk.YES)
@@ -132,7 +133,7 @@ class main():
                           width=25, height=2
                           )
         label0.pack(side=tk.LEFT, anchor=tk.W, expand=tk.YES)
-        input1 = scrolledtext.ScrolledText(root, bd=1, height=11, width=75, font=12)
+        input1 = scrolledtext.ScrolledText(root, bd=1, height=10, width=60, font=12)
         input1.pack()
 
         def copy():
@@ -141,13 +142,13 @@ class main():
         label_frame2.pack(anchor=tk.W)
         label2 = tk.Label(label_frame2,
                           text='整理文字：',
-                          font=('宋体', 12, 'bold'),
+                          font=('微软雅黑', 11, 'bold'),
                           width=15, height=2
                           )
         label2.pack(side=tk.LEFT, anchor=tk.W, expand=tk.YES)
         copy_button = ttk.Button(label_frame2,text='复制到剪贴板',command=copy)
         copy_button.pack(side=tk.LEFT, anchor=tk.W, expand=tk.YES)
-        input2 = scrolledtext.ScrolledText(root, bd=1, height=11, width=75, font=12)
+        input2 = scrolledtext.ScrolledText(root, bd=1, height=10, width=60, font=12)
         input2.pack()
 
         # 放置截图

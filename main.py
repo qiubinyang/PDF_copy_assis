@@ -19,7 +19,7 @@ class main():
         root = tk.Tk()
         root.iconbitmap('./icon.ico')
         root.resizable(width=False, height=False)
-        root.title('PDF复制助手 v 1.0--powered by Kevin 邱')
+        root.title('PDF复制助手 v 1.3--powered by Kevin 邱')
         screenwidth = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
         width = 660

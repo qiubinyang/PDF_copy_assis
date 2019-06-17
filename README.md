@@ -2,6 +2,8 @@
 自己在写论文时Ctrl C + Ctrl V  PDF 的内容出来格式各种问题，写了点代码来解决问题，顺便封装个GUI
 当然，别计较bug一堆，代码丑陋，能用就行
 
+<img src="./shoot.png" width=678 height=822>
+
 # 功能
 1. 中文复制整理
 2. 截图翻译

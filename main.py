@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import scrolledtext,ttk
+from tkinter import scrolledtext,ttk,messagebox
 import OCR
 import pyperclip
 import screen_shoot
@@ -23,8 +23,13 @@ class main():
         screenwidth = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
         width = 660
-        height = 730
-        root.geometry('%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, 20))
+        height = 750
+        root.geometry('%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 3))
+        root.deiconify()
+
+
+        # 窗口置顶
+        root.wm_attributes('-topmost',1)
 
         # 菜单栏
         menuBar = tk.Menu(root)
@@ -113,6 +118,7 @@ class main():
         radio_var2.set(1)
 
         def paste():
+            input1.delete('0.0', 'end')
             text = pyperclip.paste()
             input1.insert('insert',text)
 
@@ -159,12 +165,18 @@ class main():
             input2.insert(tk.INSERT, ocr)
 
         def organize():
+            if input1.get(0.0, tk.END) == "\n":
+                messagebox.showerror("错误","输入框不能为空")
+                return
             input2.delete('0.0', 'end')
             text = input1.get(0.0, tk.END)
             text = self.words_process(text)
             input2.insert(tk.INSERT, text)
 
         def shoot():
+            root.destroy()
+            screen_shoot.begin()
+        def shoot_key(event):
             root.destroy()
             screen_shoot.begin()
 
@@ -181,9 +193,9 @@ class main():
         label_frame3 = tk.Frame(root)
         label_frame3.pack(anchor=tk.W)
         label3 = tk.Label(label_frame3,
-                          text='使用截图进行文字识别：',
+                          text='使用截图进行文字识别：(快捷键 Ctrl + Alt + A)',
                           font=('宋体', 12, 'bold'),
-                          width=30, height=1
+                          width=50, height=1
                           )
         label3.pack(side=tk.LEFT, anchor=tk.W, expand=tk.YES)
 
@@ -193,20 +205,30 @@ class main():
                                width=15,
                                # font=12,
                                command=shoot)
+        screen_cut.bind_all('<Control-Alt-a>', shoot_key)
         screen_cut.pack()
 
         root.mainloop()
 
+    def is_alphabet(self,uchar):
+        """判断一个unicode是否是英文字母"""
+        if (uchar >= u'\u0041' and uchar <= u'\u005a') or (uchar >= u'\u0061' and uchar <= u'\u007a'):
+            return True
+        else:
+            return False
 
     def words_process(self,text):
         if self.DELETE_SPACE:
             text = text.replace(' ', '')
         if self.DELETE_WRAP:
-            text = text.replace('\n', '')
+            while (text.find('\n') != -1):
+                i = text.find('\n')
+                if i-1>0 and i+1 < len(text) and self.is_alphabet(text[i - 1]) and self.is_alphabet(text[i + 1]):
+                    text = text[:i] + " " + text[i + 1:]
+                else:
+                    text = text[:i] + text[i + 1:]
         if self.DELETE_TABS:
             text = text.replace('\t', '')
-        if self.CHINESE_SYMBOL:
-            text = text.replace(',', '，')
         if self.CLIPBOARD:
             pyperclip.copy(text)
         if self.HALF_WIDTH == 1:
@@ -229,6 +251,11 @@ class main():
                     inside_code += 65248
                 rstring += chr(inside_code)
             text = rstring
+        if self.CHINESE_SYMBOL:
+            E_pun = u',.!?[]()<>"\''
+            C_pun = u'，。！？【】（）《》“‘'
+            table = {ord(f): ord(t) for f, t in zip(E_pun, C_pun)}
+            text = text.translate(table)
         if self.SIMPLE == 1:
             text = Converter('zh-hans').convert(text)
         else:

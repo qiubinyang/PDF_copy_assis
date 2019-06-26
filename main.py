@@ -4,6 +4,9 @@ import OCR
 import pyperclip
 import screen_shoot
 from Simplified_Traditional.langconv import Converter
+import pickle
+import requests
+import googletrans
 
 class main():
     def __init__(self,photo=False):
@@ -15,21 +18,33 @@ class main():
         self.HALF_WIDTH = 1
         self.SIMPLE = 1
         self.photo = photo
+        self.base_url = "http://106.14.182.45:8899"
+        self.trans = googletrans.Translator(service_urls=['translate.google.cn'])
     def show(self):
         root = tk.Tk()
-        root.iconbitmap('./icon.ico')
+        # root.iconbitmap('./icon.ico')
         root.resizable(width=False, height=False)
         root.title('PDF复制助手 v 1.3--powered by Kevin 邱')
         screenwidth = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
         width = 660
-        height = 750
-        root.geometry('%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 3))
+        height = 730
+        root.geometry('%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 5))
         root.deiconify()
 
 
         # 窗口置顶
-        root.wm_attributes('-topmost',1)
+        # root.wm_attributes('-topmost',1)
+
+        # 广播通知
+        with open('config', 'rb') as f:
+            config = pickle.load(f)
+            if config['show_broadcast_message'] == 1 and requests.get(self.base_url+'/new_message').text == "True":
+                tk.messagebox.showinfo("广播", requests.get(self.base_url + '/broadcast_message').text)
+                tk.messagebox.showinfo("广播", "广播测试")
+                config['show_broadcast_message'] = 0
+                with open('config', 'wb') as f:
+                    pickle.dump(config, f)
 
         # 菜单栏
         menuBar = tk.Menu(root)
@@ -53,6 +68,15 @@ class main():
             msg = "Kevin 邱 制作\n欢迎反馈和交流：qiubinyang98@163.com"
             Mes = tk.Label(top,text=msg,font=12)
             Mes.pack()
+        def Response():
+            top = tk.Toplevel()
+            top.resizable(width=False, height=False)
+            top.geometry('%dx%d+%d+%d' % (500, 100, (screenwidth - 500) / 2, (screenheight - 100) / 2))
+            top.title('关于')
+
+            msg = "Kevin 邱 制作\n欢迎反馈和交流：qiubinyang98@163.com"
+            Mes = tk.Label(top, text=msg, font=12)
+            Mes.pack()
         def Exit():
             root.destroy()
 
@@ -64,6 +88,7 @@ class main():
         helpMenu = tk.Menu(menuBar, tearoff=0)
         menuBar.add_cascade(label="帮助", menu=helpMenu)
         helpMenu.add_command(label="关于", command=About)
+        helpMenu.add_command(label="反馈", command=Response)
 
         title = tk.Label(root,
                          text='PDF复制助手',
@@ -139,7 +164,7 @@ class main():
                           width=25, height=2
                           )
         label0.pack(side=tk.LEFT, anchor=tk.W, expand=tk.YES)
-        input1 = scrolledtext.ScrolledText(root, bd=1, height=10, width=60, font=12)
+        input1 = scrolledtext.ScrolledText(root, bd=1, height=9, width=60, font=10)
         input1.pack()
 
         def copy():
@@ -154,7 +179,7 @@ class main():
         label2.pack(side=tk.LEFT, anchor=tk.W, expand=tk.YES)
         copy_button = ttk.Button(label_frame2,text='复制到剪贴板',command=copy)
         copy_button.pack(side=tk.LEFT, anchor=tk.W, expand=tk.YES)
-        input2 = scrolledtext.ScrolledText(root, bd=1, height=10, width=60, font=12)
+        input2 = scrolledtext.ScrolledText(root, bd=1, height=9, width=60, font=10)
         input2.pack()
 
         # 放置截图
@@ -173,12 +198,29 @@ class main():
             text = self.words_process(text)
             input2.insert(tk.INSERT, text)
 
+        def trans():
+            trans_before = input2.get(0.0,tk.END)
+            trans_result = self.trans.translate(trans_before,dest='zh-CN').text
+            top = tk.Toplevel()
+            top.resizable(width=False, height=False)
+            top.geometry('%dx%d+%d+%d' % (700, 500, (screenwidth - 600) / 2, (screenheight - 600) / 2))
+            top.title('翻译结果')
+            trans_scroll = tk.Scrollbar(top)
+            trans_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+            Mes = tk.Text(top, font=12)
+            Mes.insert(tk.INSERT,trans_result)
+            Mes.pack(side=tk.LEFT,fill=tk.Y)
+
+            trans_scroll.config(command=Mes.yview)
+            Mes.config(yscrollcommand=trans_scroll.set)
+
         def shoot():
             root.destroy()
             screen_shoot.begin()
         def shoot_key(event):
             root.destroy()
-            screen_shoot.begin()
+            screen_shoot.quick_begin()
 
         submit = ttk.Button(label_frame2,
                            text='整理',
@@ -186,6 +228,13 @@ class main():
                            # font=12,
                            command=organize)
         submit.pack(side=tk.LEFT, anchor=tk.W, expand=tk.YES)
+
+        trans = ttk.Button(label_frame2,
+                            text='翻译',
+                            # width=15,
+                            # font=12,
+                            command=trans)
+        trans.pack(side=tk.LEFT, anchor=tk.W, expand=tk.YES)
 
         line = tk.Canvas(root, height=30, width=900)
         line.pack()

@@ -18,7 +18,8 @@ class main():
         self.HALF_WIDTH = 1
         self.SIMPLE = 1
         self.photo = photo
-        self.base_url = "http://106.14.182.45:8899"
+        # self.base_url = "http://106.14.182.45:8899"
+        self.base_url = "http://localhost:8899"
         self.trans = googletrans.Translator(service_urls=['translate.google.cn'])
     def show(self):
         root = tk.Tk()
@@ -41,10 +42,10 @@ class main():
             config = pickle.load(f)
             if config['show_broadcast_message'] == 1 and requests.get(self.base_url+'/new_message').text == "True":
                 tk.messagebox.showinfo("广播", requests.get(self.base_url + '/broadcast_message').text)
-                tk.messagebox.showinfo("广播", "广播测试")
                 config['show_broadcast_message'] = 0
                 with open('config', 'wb') as f:
                     pickle.dump(config, f)
+        print('broadcast finished')
 
         # 菜单栏
         menuBar = tk.Menu(root)
@@ -71,10 +72,10 @@ class main():
         def Response():
             top = tk.Toplevel()
             top.resizable(width=False, height=False)
-            top.geometry('%dx%d+%d+%d' % (500, 100, (screenwidth - 500) / 2, (screenheight - 100) / 2))
-            top.title('关于')
+            top.geometry('%dx%d+%d+%d' % (800, 100, (screenwidth - 800) / 2, (screenheight - 100) / 2))
+            top.title('问题解决')
 
-            msg = "Kevin 邱 制作\n欢迎反馈和交流：qiubinyang98@163.com"
+            msg = "有问题请联系：qiubinyang98@163.com\n" + requests.get(self.base_url+"/broadcast_message").text
             Mes = tk.Label(top, text=msg, font=12)
             Mes.pack()
         def Exit():
@@ -88,7 +89,7 @@ class main():
         helpMenu = tk.Menu(menuBar, tearoff=0)
         menuBar.add_cascade(label="帮助", menu=helpMenu)
         helpMenu.add_command(label="关于", command=About)
-        helpMenu.add_command(label="反馈", command=Response)
+        helpMenu.add_command(label="问题解决", command=Response)
 
         title = tk.Label(root,
                          text='PDF复制助手',
